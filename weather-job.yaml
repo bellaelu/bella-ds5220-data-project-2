@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: weather-cronjob
+  namespace: default
+spec:
+  schedule: "0 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: weather
+            image: ghcr.io/bellaelu/ds5220-weather:latest
+            env:
+            - name: S3_BUCKET
+              value: "fpq5wq-ds5220-project2"
+            - name: DYNAMO_TABLE
+              value: "weather-tracking"
+            - name: AWS_REGION
+              value: "us-east-1"
+          restartPolicy: OnFailure
