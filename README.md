@@ -1,3 +1,18 @@
+
+Which data source you chose and why.
+I chose the Open-Meteo weather API because it doesn’t require an API key to access it. It also updates hourly and provides good metric variables like temperature, wind speed, precipitation, and cloud cover. This makes sense for the 72-hour window since weather changes gradually and reveals patterns across day/night cycles. 
+What you observe in the data — any patterns, spikes, or surprises over the 72-hour window.
+For the time period that we are in now (transition to summer), it is very interesting that the weather consistently dropped to 30 degrees for the first two nights. Most of the temperature stayed around the 30-60 range, which makes sense for the day and night time temperatures. The wind speed dropped on April 9th, but that is not surprising either. 
+
+How Kubernetes Secrets differ from plain environment variables and why that distinction matters.
+Plain environment variables are defined in the YAML manifest so that everyone who reads the file are able to see the value. The Kubernetes Secrets store more sensitive values encrypted in the cluster’s etcd database and injects them into pods at runtime without writing them to disk or embedding them into a file. For our case, the YAML is publicly available on GitHub so a plain environmental variable could very quickly be exposed while the Secrets would only reveal the secret name and not the value. 
+
+How your CronJob pods gain permission to read/write to AWS services without credentials appearing in any file.
+The EC2 instance has an IAM role attached to it at the instance level. When any process running on that instance (including Kubernetes pod) makes an AWS API call, the AWS SDK automatically queries the EC2 instance metadata service at the internal address to retrieve temporary STS credentials. This happens through SDK’s credential provider chain so that no access key or secret key ever needs to appear in code. 
+
+One thing you would do differently if you were building this pipeline for a real production system.
+If I were building this pipeline for a real production system, I would adding alerting and observability. This way, notifications can be pushed when no new data points are added to DynamoDB for an extended period of time. The silent failures are more dangerous and it would be difficult to know when the job goes down. 
+
 # DS5220 Data Project 2
 
 Create, schedule, and run a containerized data pipeline in Kubernetes.
@@ -284,3 +299,4 @@ In addition to the above, submit a short written response (one paragraph each) t
 2. The ISS tracker detects orbital burns by comparing consecutive altitude readings. Describe at least one way this detection logic could produce a false positive, and how you would make it more robust.
 3. How does each `CronJob` pod get AWS permissions without credentials being passed into the container?
 4. Notice the structure of the `iss-tracking` table in DynamoDB. What is the partition key and what is the sort key? Why do these work well in this example, but may not work for other solutions?
+
